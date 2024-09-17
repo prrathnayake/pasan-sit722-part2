@@ -1,1 +1,37 @@
-# Write Kubernetes Deployment Script
+apiVersion: apps/v1 #specify the API version
+kind: Deployment #specify the kind of deployment
+metadata: # meta data that help to identify resources
+  name: book-catalog 
+spec:
+  replicas: 1 # replica count
+  selector: # identify which port to deployment
+    matchLabels:
+      app: book-catalog
+  template:
+    metadata:
+      labels:
+        app: book-catalog
+    spec:
+      containers: # container details
+      - name: book-catalog
+        image: bookc:latest # image name
+        imagePullPolicy: Never # set image pull policy to never
+        ports: 
+        - containerPort: 8000 # define container port
+        env: # define environment variables
+        - name: "DATABASE_URL"
+          value: "postgresql://part2_mfvj_user:5r6rXsbOoRBDha9dIslt6OCeHa0cBOUT@dpg-crjnlktumphs73d2f1p0-a.oregon-postgres.render.com/part2_mfvj"
+---
+apiVersion: v1
+kind: Service # Declares that this resource is a Service
+metadata:
+  name: book-catalog
+spec:
+  selector:
+    app: book-catalog
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8000
+      targetPort: 8000
+      nodePort: 30000
